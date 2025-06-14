@@ -19,11 +19,11 @@ app.use("/api/auth", authUser);
 app.use("/api/message", messageRoute);
 app.use("/api/user", userRoute);
 
-app.use(express.static(path.join(__dirname, "/frontend/dist")));
+/*app.use(express.static(path.join(__dirname, "/frontend/dist")));
 
-app.get(/^\/(?!api).*/, (req, res) => {
+app.get(/^\/(?!api)., (req, res) => {
   res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
-});
+}); */
 
 const PORT = process.env.PORT || 3000;
 

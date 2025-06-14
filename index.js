@@ -6,11 +6,18 @@ import messageRoute from "./Route/messageRoute.js";
 import cookieParser from "cookie-parser";
 import userRoute from "./Route/userRoute.js";
 import path from "path";
+import cors from "cors";
 import { app, server } from "./Socket/socket.js";
 
 const __dirname = path.resolve();
 
 dotenv.config();
+
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+  })
+);
 
 app.use(express.json());
 app.use(cookieParser());

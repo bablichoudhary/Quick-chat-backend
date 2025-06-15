@@ -1,30 +1,26 @@
+
 import jwt from "jsonwebtoken";
 import User from "../Models/userModel.js";
 
 const isLogin = async (req, res, next) => {
   try {
-    const token = req.cookies.jwt || req.headers.authorization?.split(" ")[1];
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(" ")[1];
 
     if (!token)
-      return res
-        .status(401)
-        .send({ success: false, message: "User unauthorized" });
+      return res.status(401).json({ success: false, message: "No token provided" });
 
-    const decode = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decode)
-      return res.status(401).send({ success: false, message: "Invalid token" });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userID).select("-password");
 
-    const user = await User.findById(decode.userID).select("-password"); // ✅ await lagaya
     if (!user)
-      return res
-        .status(404)
-        .send({ success: false, message: "User not found" });
+      return res.status(404).json({ success: false, message: "User not found" });
 
     req.user = user;
     next();
   } catch (error) {
-    console.log("Error in isLogin middleware:", error.message);
-    res.status(500).send({ success: false, message: error.message });
+    console.error("JWT Auth Error:", error.message);
+    res.status(401).json({ success: false, message: "Unauthorized" });
   }
 };
 

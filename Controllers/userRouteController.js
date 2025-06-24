@@ -56,40 +56,42 @@ export const userLogin = async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
 
-    if (!user)
-      return res.status(400).send({
+    if (!user) {
+      return res.status(500).json({
         success: false,
         message: "Email doesn't exist. Please register.",
       });
+    }
 
-    const comparePass = bcryptjs.compareSync(password, user.password || "");
+    const isMatch = bcryptjs.compareSync(password, user.password || "");
 
-    if (!comparePass)
-      return res.status(400).send({
+    if (!isMatch) {
+      return res.status(500).json({
         success: false,
         message: "Invalid email or password",
       });
+    }
 
-    const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "30d",
-    });
+    const token = jwtToken(user._id, res); // ✅ Get the token
 
-    res.status(200).send({
+    return res.status(200).json({
       success: true,
-      token,
-      _id: user._id,
-      fullname: user.fullname,
-      username: user.username,
-      profilepic: user.profilepic,
-      email: user.email,
+      token, // ✅ Send it in response
+      user: {
+        _id: user._id,
+        fullname: user.fullname,
+        username: user.username,
+        profilepic: user.profilepic,
+        email: user.email,
+      },
       message: "Successfully logged in",
     });
   } catch (error) {
-    res.status(500).send({
+    console.error("Login error:", error);
+    return res.status(500).json({
       success: false,
       message: error.message,
     });
-    console.log(error);
   }
 };
 

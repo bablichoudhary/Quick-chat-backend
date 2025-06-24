@@ -57,7 +57,7 @@ export const userLogin = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user)
-      return res.status(500).send({
+      return res.status(400).send({
         success: false,
         message: "Email doesn't exist. Please register.",
       });
@@ -65,13 +65,18 @@ export const userLogin = async (req, res) => {
     const comparePass = bcryptjs.compareSync(password, user.password || "");
 
     if (!comparePass)
-      return res.status(500).send({
+      return res.status(400).send({
         success: false,
         message: "Invalid email or password",
       });
 
-    jwtToken(user._id, res);
+    const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "30d",
+    });
+
     res.status(200).send({
+      success: true,
+      token,
       _id: user._id,
       fullname: user.fullname,
       username: user.username,

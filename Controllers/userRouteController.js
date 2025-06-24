@@ -14,10 +14,10 @@ export const userRegister = async (req, res) => {
     const hashPassword = bcryptjs.hashSync(password, 10);
     const profileBoy =
       profilepic ||
-      "https://avatar.iran.liara.run/public/boy?username=${username}";
+      `https://avatar.iran.liara.run/public/boy?username=${data.username}`;
     const profileGirl =
       profilepic ||
-      "https://avatar.iran.liara.run/public/girl?username=${username}";
+      `https://avatar.iran.liara.run/public/girl?username=${data.username}`;
 
     const newUser = new User({
       fullname,
